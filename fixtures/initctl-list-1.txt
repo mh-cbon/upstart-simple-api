@@ -1,0 +1,24 @@
+mountnfs-bootclean.sh start/running
+rsyslog start/running, process 944
+tty4 start/running, process 991
+udev start/running, process 417
+upstart-udev-bridge start/running, process 412
+mountall-net stop/waiting
+network-interface-security (network-interface/eth1) start/running
+network-interface-security (network-interface/eth0) start/running
+network-interface-security (network-interface/lo) start/running
+network-interface-security (networking) start/running
+networking start/running
+tty6 start/running, process 1002
+procps stop/waiting
+  post-start process 1357
+  post-start process 1222
+ttyS0 stop/waiting
+idmapd start/running, process 930
+cloud-init-local stop/waiting
+console-font stop/waiting
+  post-start process 1357
+  post-start process 1222
+network-interface-container stop/waiting
+  post-start process 1357
+  post-start process 1222
