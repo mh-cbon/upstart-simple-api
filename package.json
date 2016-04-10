@@ -1,19 +1,26 @@
 {
-  "name": "upstart-simple-api",
+  "name": "@mh-cbon/upstart-simple-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple and limited api to interface with upstart",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-ubuntu": "sh ./mocha.sh"
+    "test-ubuntu": "sh ./mocha.sh",
+    "patch": "npm version patch -m \"patch %s\"",
+    "minor": "npm version minor -m \"minor %s\"",
+    "major": "npm version major -m \"major %s\"",
+    "preversion": "echo \"npm test: not defined\"",
+    "version": "echo \"npm run build: not defined\"",
+    "postversion": "git push && git push --tags && npm run public",
+    "public": "npm publish --access=public"
   },
   "keywords": [
-    "upstart", "services"
+    "upstart", "services", "ubuntu"
   ],
   "author": "mh-cbon <mh-cbon@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "@mh-cbon/sp-lsbish": "github:mh-cbon/sp-lsbish",
+    "@mh-cbon/sp-lsbish": "@mh-cbon/sp-lsbish",
     "fs-extra": "^0.26.7",
     "split": "^1.0.0",
     "through2": "^2.0.1"
