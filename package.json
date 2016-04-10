@@ -1,6 +1,6 @@
 {
   "name": "@mh-cbon/upstart-simple-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple and limited api to interface with upstart",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,9 @@
     "public": "npm publish --access=public"
   },
   "keywords": [
-    "upstart", "services", "ubuntu"
+    "upstart",
+    "services",
+    "ubuntu"
   ],
   "author": "mh-cbon <mh-cbon@users.noreply.github.com>",
   "license": "MIT",
