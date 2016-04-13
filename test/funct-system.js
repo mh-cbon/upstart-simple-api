@@ -2,8 +2,16 @@ var should = require('should');
 var fs = require('fs');
 var UpstartSimpleApi = require('../index.js');
 
-describe('upstart-simple-api userland', function() {
+describe('upstart-simple-api system', function() {
   var usapi = new UpstartSimpleApi();
+
+  it('should not list the fake service', function(done) {
+    usapi.list({}, function (err, list) {
+      ('fake' in list).should.eql(false);
+      done();
+    })
+  });
+
   it('should install the fake service', function(done) {
     var service = {
       id: 'fake',
@@ -21,15 +29,12 @@ describe('upstart-simple-api userland', function() {
     usapi.install(service, done)
   });
 
-  it('should not list the fake service', function(done) {
-    usapi.list({}, function (err, list) {
-      ('fake' in list).should.be.false;
-      done();
-    })
-  });
-
   it('should reload the configuration', function(done) {
-    usapi.reloadConfiguration({}, done)
+    usapi.reloadConfiguration({}, function (err) {
+      setTimeout(function(){
+        done(err);
+      }, 500);
+    })
   });
 
   it('should start the fake service', function(done) {
@@ -42,7 +47,7 @@ describe('upstart-simple-api userland', function() {
 
   it('should list the fake service', function(done) {
     usapi.list({}, function (err, list) {
-      ('fake' in list).should.be.true;
+      ('fake' in list).should.eql(true);
       list['fake'].id.should.eql('fake');
       done();
     })
@@ -65,4 +70,14 @@ describe('upstart-simple-api userland', function() {
   it('should stop the fake service', function(done) {
     usapi.stop('fake', {}, done)
   });
+
+  it('should uninstall the fake service', function(done) {
+    usapi.uninstall({id: 'fake'}, done)
+  });
+
+  it('should reload the configuration', function(done) {
+    usapi.reloadConfiguration({}, done)
+  });
+
+
 });

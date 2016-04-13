@@ -56,43 +56,44 @@ describe('upstart-simple-api', function() {
     })
   });
 
+  it('stops a well known service', function(done) {
+    var usapi = new UpstartSimpleApi();
+    usapi.stop('cron', {}, function (err) {
+      (err===null).should.eql(true);
+      done();
+    })
+  });
 
   it('starts a well known service', function(done) {
     var usapi = new UpstartSimpleApi();
-    usapi.start('puppet', {}, function (err) {
-      (err===null).should.be.true;
+    usapi.start('cron', {}, function (err) {
+      (err===null).should.eql(true);
       done();
     })
   });
 
   it('restarts a well known service', function(done) {
     var usapi = new UpstartSimpleApi();
-    usapi.restart('puppet', {}, function (err) {
-      (err===null).should.be.true;
+    usapi.restart('cron', {}, function (err) {
+      (err===null).should.eql(true);
       done();
     })
   });
 
   it('reloads a well known service', function(done) {
     var usapi = new UpstartSimpleApi();
-    usapi.reload('puppet', {}, function (err) {
-      (err===null).should.be.true;
+    usapi.reload('cron', {}, function (err) {
+      (err===null).should.eql(true);
       done();
     })
   });
 
   it('force-reloads a well known service', function(done) {
     var usapi = new UpstartSimpleApi();
-    usapi.reload('puppet', {force: true}, function (err) {
-      (err===null).should.be.true;
-      done();
-    })
-  });
-
-  it('stops a well known service', function(done) {
-    var usapi = new UpstartSimpleApi();
-    usapi.stop('puppet', {}, function (err) {
-      (err===null).should.be.true;
+    usapi.reload('cron', {force: true}, function (err) {
+      console.log(err);
+      console.log(err);
+      (err===null).should.eql(true);
       done();
     })
   });
@@ -100,7 +101,7 @@ describe('upstart-simple-api', function() {
   it('fails to start an unknown service', function(done) {
     var usapi = new UpstartSimpleApi();
     usapi.stop('bs', {}, function (err) {
-      (err===null).should.be.false;
+      (err===null).should.eql(false);
       done();
     })
   });
@@ -108,9 +109,9 @@ describe('upstart-simple-api', function() {
   it('installs a service file', function(done) {
     var usapi = new UpstartSimpleApi();
     usapi.install({id: 'bs', user: true}, function (err) {
-      (err===null).should.be.true;
+      (err===null).should.eql(true);
       fs.access(process.env['HOME'] + '/.init/bs.conf', fs.R_OK, function (err) {
-        (err===null).should.be.true;
+        (err===null).should.eql(true);
         done();
       });
     })
@@ -119,9 +120,9 @@ describe('upstart-simple-api', function() {
   it('uninstalls a service file', function(done) {
     var usapi = new UpstartSimpleApi();
     usapi.uninstall({id: 'bs', user: true}, function (err) {
-      (err===null).should.be.true;
+      (err===null).should.eql(true);
       fs.access(process.env['HOME'] + '/.init/bs.conf', fs.R_OK, function (err) {
-        (err===null).should.be.false;
+        (err===null).should.eql(false);
         done();
       });
     })

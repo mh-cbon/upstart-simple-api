@@ -40,13 +40,13 @@ sds.stop('serviceId', opts={}, function (err) {
   console.log(err);
 })
 
-// systemctl reload serviceId --user
-sds.reload(opts={user: true}, function (err) {
+// initctl reload serviceId
+sds.reload('serviceId', function (err) {
   console.log(err);
 })
 
-// systemctl reload-configuration
-sds.reloadconfiguration(opts={}, function (err) {
+// initctl reload-configuration serviceId
+sds.reloadConfiguration('serviceId', function (err) {
   console.log(err);
 })
 ```

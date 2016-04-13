@@ -7,7 +7,7 @@ if [ ! -f /home/vagrant/node/node-v5.9.1-linux-x64.tar.xz ]; then
 fi
 cd /vagrant/
 /home/vagrant/node/node-v5.9.1-linux-x64/bin/npm i
-/home/vagrant/node/node-v5.9.1-linux-x64/bin/node /home/vagrant/node/node-v5.9.1-linux-x64/bin/mocha test/index.js
 /home/vagrant/node/node-v5.9.1-linux-x64/bin/node /home/vagrant/node/node-v5.9.1-linux-x64/bin/mocha test/initctl*
 /home/vagrant/node/node-v5.9.1-linux-x64/bin/node /home/vagrant/node/node-v5.9.1-linux-x64/bin/mocha test/funct-user.js
+sudo /home/vagrant/node/node-v5.9.1-linux-x64/bin/node /home/vagrant/node/node-v5.9.1-linux-x64/bin/mocha test/index.js
 sudo /home/vagrant/node/node-v5.9.1-linux-x64/bin/node /home/vagrant/node/node-v5.9.1-linux-x64/bin/mocha test/funct-system.js

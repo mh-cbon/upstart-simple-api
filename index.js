@@ -86,29 +86,29 @@ function SimpleUpstartApi () {
     child.on('error', then)
   }
   this.start = function (serviceId, opts, then) {
-    return runSystemControls(
-      spawn('initctl', ['start', serviceId]),
-      then
-    )
+    var c;
+    if (opts.user) c = spawn('initctl', ['start', serviceId])
+    else c = spawn('service', [serviceId, 'start'])
+    return runSystemControls(c, then)
   }
   this.stop = function (serviceId, opts, then) {
-    return runSystemControls(
-      spawn('initctl', ['stop', serviceId]),
-      then
-    )
+    var c;
+    if (opts.user) c = spawn('initctl', ['stop', serviceId])
+    else c = spawn('service', [serviceId, 'stop'])
+    return runSystemControls(c, then)
   }
   this.restart = function (serviceId, opts, then) {
-    return runSystemControls(
-      spawn('initctl', ['restart', serviceId]),
-      then
-    )
+    var c;
+    if (opts.user) c = spawn('initctl', ['restart', serviceId])
+    else c = spawn('service', [serviceId, 'restart'])
+    return runSystemControls(c, then)
   }
   this.reload = function (serviceId, opts, then) {
     var verb = opts.force ? 'force-reload' : 'reload';
-    return runSystemControls(
-      spawn('initctl', [verb, serviceId]),
-      then
-    )
+    var c;
+    if (opts.user) c = spawn('initctl', [verb, serviceId])
+    else c = spawn('service', [serviceId, verb])
+    return runSystemControls(c, then)
   }
   this.reloadConfiguration = function (opts, then) {
     return runSystemControls(
