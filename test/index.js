@@ -91,8 +91,6 @@ describe('upstart-simple-api', function() {
   it('force-reloads a well known service', function(done) {
     var usapi = new UpstartSimpleApi();
     usapi.reload('cron', {force: true}, function (err) {
-      console.log(err);
-      console.log(err);
       (err===null).should.eql(true);
       done();
     })
