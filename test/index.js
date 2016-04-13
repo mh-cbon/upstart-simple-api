@@ -2,7 +2,7 @@ var should = require('should');
 var fs = require('fs');
 var UpstartSimpleApi = require('../index.js');
 
-describe('systemd-simple-api', function() {
+describe('upstart-simple-api', function() {
   it('lists services', function(done) {
     var usapi = new UpstartSimpleApi();
     usapi.list({}, function (err, list) {
