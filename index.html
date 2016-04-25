@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Upstart-simple-api by mh-cbon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Upstart-simple-api</h1>
+      <h2 class="project-tagline">Simple api for node to manage services via upstart</h2>
+      <a href="https://github.com/mh-cbon/upstart-simple-api" class="btn">View on GitHub</a>
+      <a href="https://github.com/mh-cbon/upstart-simple-api/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/mh-cbon/upstart-simple-api/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="upstart-simple-api" class="anchor" href="#upstart-simple-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>upstart-simple-api</h1>
+
+<p>Simple and limited api to interface with upstart.</p>
+
+<h1>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>install</h1>
+
+<div class="highlight highlight-source-shell"><pre>npm i @mh-cbon/upstart-simple-api --save</pre></div>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>usage</h1>
+
+<p>Beware,</p>
+
+<ul>
+<li>user jobs are not well tested because they cannot be initialized easily with a vagrant ubuntu box.</li>
+<li>
+<code>describe</code> method is quiet limited in regard of upstart script language, it is intended.</li>
+</ul>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> UpstartSimpleApi <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>@mh-cbon/upstart-simple-api<span class="pl-pds">'</span></span>);
+<span class="pl-k">var</span> usapi <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">UpstartSimpleApi</span>(<span class="pl-c">/* version */</span>);
+
+<span class="pl-c">// initctl list</span>
+<span class="pl-smi">usapi</span>.<span class="pl-en">list</span>(opts<span class="pl-k">=</span>{}, <span class="pl-k">function</span> (<span class="pl-smi">err</span>, <span class="pl-smi">items</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(items);
+})
+
+<span class="pl-c">// initctl show-config serviceId</span>
+<span class="pl-smi">sds</span>.<span class="pl-en">describe</span>(<span class="pl-s"><span class="pl-pds">'</span>serviceId<span class="pl-pds">'</span></span>, opts<span class="pl-k">=</span>{}, <span class="pl-k">function</span> (<span class="pl-smi">err</span>, <span class="pl-smi">info</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(info);
+})
+
+<span class="pl-c">// initctl start serviceId</span>
+<span class="pl-smi">sds</span>.<span class="pl-c1">start</span>(<span class="pl-s"><span class="pl-pds">'</span>serviceId<span class="pl-pds">'</span></span>, opts<span class="pl-k">=</span>{}, <span class="pl-k">function</span> (<span class="pl-smi">err</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(err);
+})
+
+<span class="pl-c">// initctl stop serviceId</span>
+<span class="pl-smi">sds</span>.<span class="pl-c1">stop</span>(<span class="pl-s"><span class="pl-pds">'</span>serviceId<span class="pl-pds">'</span></span>, opts<span class="pl-k">=</span>{}, <span class="pl-k">function</span> (<span class="pl-smi">err</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(err);
+})
+
+<span class="pl-c">// initctl reload serviceId</span>
+<span class="pl-smi">sds</span>.<span class="pl-c1">reload</span>(<span class="pl-s"><span class="pl-pds">'</span>serviceId<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">err</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(err);
+})
+
+<span class="pl-c">// initctl reload-configuration serviceId</span>
+<span class="pl-smi">sds</span>.<span class="pl-en">reloadConfiguration</span>(<span class="pl-s"><span class="pl-pds">'</span>serviceId<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">err</span>) {
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(err);
+})</pre></div>
+
+<h2>
+<a id="install-a-service" class="anchor" href="#install-a-service" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install a Service</h2>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// per user</span>
+<span class="pl-k">var</span> service <span class="pl-k">=</span> {
+  user<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+  id<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>fake<span class="pl-pds">'</span></span>,
+  stanzas<span class="pl-k">:</span> [
+    {
+      name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>author<span class="pl-pds">'</span></span>,
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>whatever<span class="pl-pds">'</span></span>
+    },
+    {
+      name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>exec<span class="pl-pds">'</span></span>,
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/bin/sh ...<span class="pl-pds">'</span></span>
+    }
+  ]
+}
+<span class="pl-smi">usapi</span>.<span class="pl-en">install</span>(service, done)
+
+<span class="pl-c">// system wide</span>
+<span class="pl-k">var</span> service <span class="pl-k">=</span> {
+  user<span class="pl-k">:</span> <span class="pl-k">!</span><span class="pl-c1">true</span>,
+  id<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>fake<span class="pl-pds">'</span></span>,
+  stanzas<span class="pl-k">:</span> [
+    {
+      name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>author<span class="pl-pds">'</span></span>,
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>whatever<span class="pl-pds">'</span></span>
+    },
+    {
+      name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>exec<span class="pl-pds">'</span></span>,
+      value<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/bin/sh ...<span class="pl-pds">'</span></span>
+    }
+  ]
+}
+<span class="pl-smi">usapi</span>.<span class="pl-en">install</span>(service, done)
+
+
+<span class="pl-c">// later...</span>
+<span class="pl-smi">usapi</span>.<span class="pl-en">uninstall</span>(service, done)</pre></div>
+
+<h1>
+<a id="read-more" class="anchor" href="#read-more" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>read more</h1>
+
+<ul>
+<li><a href="http://askubuntu.com/questions/637305/how-do-i-control-an-upstart-session-job-over-ssh">http://askubuntu.com/questions/637305/how-do-i-control-an-upstart-session-job-over-ssh</a></li>
+<li><a href="http://upstart.ubuntu.com/cookbook/#joining-a-session">http://upstart.ubuntu.com/cookbook/#joining-a-session</a></li>
+<li><a href="http://upstart.ubuntu.com/cookbook/#session-init">http://upstart.ubuntu.com/cookbook/#session-init</a></li>
+<li><a href="http://upstart.ubuntu.com/wiki/Stanzas">http://upstart.ubuntu.com/wiki/Stanzas</a></li>
+<li><a href="http://dev.deluge-torrent.org/wiki/UserGuide/Service/Upstart">http://dev.deluge-torrent.org/wiki/UserGuide/Service/Upstart</a></li>
+<li><a href="http://minecraft.gamepedia.com/Tutorials/Ubuntu_startup_script">http://minecraft.gamepedia.com/Tutorials/Ubuntu_startup_script</a></li>
+<li><a href="https://www.nginx.com/resources/wiki/start/topics/examples/ubuntuupstart/#">https://www.nginx.com/resources/wiki/start/topics/examples/ubuntuupstart/#</a></li>
+<li><a href="https://www.exratione.com/2013/02/nodejs-and-forever-as-a-service-simple-upstart-and-init-scripts-for-ubuntu/">https://www.exratione.com/2013/02/nodejs-and-forever-as-a-service-simple-upstart-and-init-scripts-for-ubuntu/</a></li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/mh-cbon/upstart-simple-api">Upstart-simple-api</a> is maintained by <a href="https://github.com/mh-cbon">mh-cbon</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
