@@ -22,7 +22,7 @@
   "author": "mh-cbon <mh-cbon@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "@mh-cbon/sp-lsbish": "@mh-cbon/sp-lsbish",
+    "@mh-cbon/sp-lsbish": "^1.0.1",
     "fs-extra": "^0.26.7",
     "split": "^1.0.0",
     "through2": "^2.0.1"
