@@ -5,8 +5,13 @@ var UpstartSimpleApi = require('../index.js');
 describe('upstart-simple-api system', function() {
   var usapi = new UpstartSimpleApi();
 
+  if('yasudo' in process.env) usapi.enableElevation('');
+
+  this.timeout(10000);
+
   it('should not list the fake service', function(done) {
     usapi.list({}, function (err, list) {
+      err && console.log(err);
       ('fake' in list).should.eql(false);
       done();
     })
@@ -22,7 +27,7 @@ describe('upstart-simple-api system', function() {
         },
         {
           name: 'exec',
-          value: '/bin/sh -c "/home/vagrant/node/node-v5.9.1-linux-x64/bin/node /vagrant/utils/fake-service.js"'
+          value: '/bin/sh -c "' + process.argv[0] + ' /vagrant/utils/fake-service.js"'
         }
       ]
     }
@@ -47,6 +52,7 @@ describe('upstart-simple-api system', function() {
 
   it('should list the fake service', function(done) {
     usapi.list({}, function (err, list) {
+      err && console.log(err);
       ('fake' in list).should.eql(true);
       list['fake'].id.should.eql('fake');
       done();

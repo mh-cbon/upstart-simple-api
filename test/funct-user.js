@@ -23,7 +23,7 @@ describe.skip('upstart-simple-api userland', function() {
         },
         {
           name: 'exec',
-          value: '/bin/sh -c "/home/vagrant/node/node-v5.9.1-linux-x64/bin/node /vagrant/utils/fake-service.js"'
+          value: '/bin/sh -c "' + process.argv[0] + ' /vagrant/utils/fake-service.js"'
         }
       ]
     }

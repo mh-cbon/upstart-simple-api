@@ -1,12 +1,41 @@
 var spawn     = require('child_process').spawn;
 var path      = require('path')
 var fs        = require('fs-extra')
+var sudoFs    = require('@mh-cbon/sudo-fs')
+var yasudo    = require('@mh-cbon/c-yasudo')
 var split     = require('split')
 var through2  = require('through2')
 var listSP    = require('./initctl-list-sp.js')
 var spLSBish  = require('@mh-cbon/sp-lsbish')
 
 function SimpleUpstartApi () {
+
+
+  var elevationEnabled = false;
+  var pwd = false;
+  this.enableElevation = function (p) {
+    if (p===false){
+      elevationEnabled = false;
+      pwd = false;
+      return;
+    }
+    elevationEnabled = true;
+    pwd = p;
+  }
+
+  var getFs = function () {
+    return elevationEnabled ? sudoFs : fs;
+  }
+
+  var spawnAChild = function (bin, args, opts) {
+    if (elevationEnabled) {
+      opts = opts || {};
+      if (pwd) opts.password = pwd;
+      return yasudo(bin, args, opts);
+    }
+    return spawn(bin, args, opts);
+  }
+
 
   var confDir = '/etc/init/' // http://upstart.ubuntu.com/cookbook/#system-job
   this.setConfDir = function (d) {
@@ -17,7 +46,7 @@ function SimpleUpstartApi () {
 
     var results = {};
 
-    var c = spawn('initctl', ['list'])
+    var c = spawnAChild('initctl', ['list'])
 
     c.stdout
     .pipe(split())
@@ -25,16 +54,17 @@ function SimpleUpstartApi () {
     .pipe(through2.obj(function (chunk, enc, cb) {
       var id = chunk.instance ? chunk.id + '@' + chunk.instance : chunk.id;
       results[id] = chunk;
-      fs.access(path.join(confDir, chunk.id + '.conf'), function (err) {
+      (getFs().access || getFs().exists)(path.join(confDir, chunk.id + '.conf'), function (err) {
         chunk.user = !!err;
         cb(null, chunk);
       })
     }, function (cb) {
-      if (then) then(null, results)
+      then && then(null, results);
+      then = null;
     }).resume())
 
     c.on('error', function (err) {
-      then(err);
+      then && then(err);
       then = null;
     })
   }
@@ -46,7 +76,7 @@ function SimpleUpstartApi () {
     var fPath = path.join(confDir, service + '.conf')
     if (opts.user) fPath = path.join(process.env['HOME'], '.init', service + '.conf')
 
-    fs.readFile(fPath, function (err, content) {
+    getFs().readFile(fPath, function (err, content) {
       if (err) return then(err);
 
       content = content.toString();
@@ -88,31 +118,31 @@ function SimpleUpstartApi () {
   this.start = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['start', serviceId])
-    else c = spawn('service', [serviceId, 'start'])
+    else c = spawnAChild('service', [serviceId, 'start'])
     return runSystemControls(c, then)
   }
   this.stop = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['stop', serviceId])
-    else c = spawn('service', [serviceId, 'stop'])
+    else c = spawnAChild('service', [serviceId, 'stop'])
     return runSystemControls(c, then)
   }
   this.restart = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['restart', serviceId])
-    else c = spawn('service', [serviceId, 'restart'])
+    else c = spawnAChild('service', [serviceId, 'restart'])
     return runSystemControls(c, then)
   }
   this.reload = function (serviceId, opts, then) {
     var verb = opts.force ? 'force-reload' : 'reload';
     var c;
     if (opts.user) c = spawn('initctl', [verb, serviceId])
-    else c = spawn('service', [serviceId, verb])
+    else c = spawnAChild('service', [serviceId, verb])
     return runSystemControls(c, then)
   }
   this.reloadConfiguration = function (opts, then) {
     return runSystemControls(
-      spawn('initctl', ['reload-configuration']),
+      spawnAChild('initctl', ['reload-configuration']),
       then
     )
   }
@@ -148,10 +178,10 @@ function SimpleUpstartApi () {
     var dir = confDir;
     if (opts.user) dir = path.join(process.env['HOME'], '.init');
 
-    fs.mkdirs(dir, function (err) {
+    (getFs().mkdirs || getFs().mkdir)(dir, function (err) {
       if (err) return then(err)
       var fPath = path.join(dir, opts.id + '.conf')
-    fs.writeFile(fPath, content, then)
+      getFs().writeFile(fPath, content, then)
     })
   }
 
@@ -159,7 +189,7 @@ function SimpleUpstartApi () {
     var fPath = path.join(confDir, opts.id + '.conf')
     if (opts.user) fPath = path.join(process.env['HOME'], '.init', opts.id + '.conf');
 
-    fs.unlink(fPath, then)
+    getFs().unlink(fPath, then)
   }
 
 
