@@ -6,10 +6,10 @@ if [ ! -f /home/vagrant/node/node-v6.1.0-linux-x64.tar.xz ]; then
   /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/npm i mocha -g
 fi
 cd /vagrant/
-# rm -fr node_modules/
-# /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/npm i
-# /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/initctl*
-# /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/funct-user.js
-# sudo /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/index.js
-# sudo /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/funct-system.js
+rm -fr node_modules/
+/home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/npm i
+/home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/initctl*
+/home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/funct-user.js
+sudo /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/index.js
+sudo /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/funct-system.js
 yasudo='' /home/vagrant/node/node-v6.1.0-linux-x64/bin/node /home/vagrant/node/node-v6.1.0-linux-x64/bin/mocha test/funct-system.js
