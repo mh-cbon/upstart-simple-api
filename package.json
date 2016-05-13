@@ -1,6 +1,6 @@
 {
   "name": "@mh-cbon/upstart-simple-api",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Simple and limited api to interface with upstart",
   "main": "index.js",
   "scripts": {
