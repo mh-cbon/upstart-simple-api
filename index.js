@@ -121,7 +121,8 @@ function SimpleUpstartApi () {
       stderr && debug('stderr %s', stderr);
       then(code>0 ? (stderr||stdout) : null);
     })
-    child.on('error', then)
+    child.on('error', then);
+    return child;
   }
   this.start = function (serviceId, opts, then) {
     var c;
