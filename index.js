@@ -116,42 +116,42 @@ function SimpleUpstartApi () {
     child.stdout.on('data', function (d){stdout+=d.toString()})
     child.stderr.on('data', function (d){stderr+=d.toString()})
     child.on('close', function (code) {
-      code>0 && debug('code %s', code);
+      code!==0 && debug('code %s', code);
       stdout && debug('stdout %s', stdout);
       stderr && debug('stderr %s', stderr);
-      then(code>0 ? (stderr||stdout) : null);
+      then(code!==0 ? (stderr||stdout) : null);
     })
     child.on('error', then);
     return child;
   }
   this.start = function (serviceId, opts, then) {
     var c;
-    if (opts.user) c = spawn('initctl', ['start', serviceId])
-    else c = spawnAChild('service', [serviceId, 'start'])
+    if (opts.user) c = spawn('initctl', ['start', serviceId], {stdio: 'pipe'})
+    else c = spawnAChild('service', [serviceId, 'start'], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.stop = function (serviceId, opts, then) {
     var c;
-    if (opts.user) c = spawn('initctl', ['stop', serviceId])
-    else c = spawnAChild('service', [serviceId, 'stop'])
+    if (opts.user) c = spawn('initctl', ['stop', serviceId], {stdio: 'pipe'})
+    else c = spawnAChild('service', [serviceId, 'stop'], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.restart = function (serviceId, opts, then) {
     var c;
-    if (opts.user) c = spawn('initctl', ['restart', serviceId])
-    else c = spawnAChild('service', [serviceId, 'restart'])
+    if (opts.user) c = spawn('initctl', ['restart', serviceId], {stdio: 'pipe'})
+    else c = spawnAChild('service', [serviceId, 'restart'], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.reload = function (serviceId, opts, then) {
     var verb = opts.force ? 'force-reload' : 'reload';
     var c;
-    if (opts.user) c = spawn('initctl', [verb, serviceId])
-    else c = spawnAChild('service', [serviceId, verb])
+    if (opts.user) c = spawn('initctl', [verb, serviceId], {stdio: 'pipe'})
+    else c = spawnAChild('service', [serviceId, verb], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.reloadConfiguration = function (opts, then) {
     return runSystemControls(
-      spawnAChild('initctl', ['reload-configuration']),
+      spawnAChild('initctl', ['reload-configuration'], {stdio: 'pipe'}),
       then
     )
   }
