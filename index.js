@@ -4,6 +4,8 @@ var fs        = require('fs-extra')
 var sudoFs    = require('@mh-cbon/sudo-fs')
 var yasudo    = require('@mh-cbon/c-yasudo')
 var split     = require('split')
+var pkg       = require('./package.json')
+var debug     = require('debug')(pkg.name)
 var through2  = require('through2')
 var listSP    = require('./initctl-list-sp.js')
 var spLSBish  = require('@mh-cbon/sp-lsbish')
@@ -29,10 +31,12 @@ function SimpleUpstartApi () {
 
   var spawnAChild = function (bin, args, opts) {
     if (elevationEnabled) {
+      debug('sudo %s %s', bin, args.join(' '))
       opts = opts || {};
       if (pwd) opts.password = pwd;
       return yasudo(bin, args, opts);
     }
+    debug('%s %s', bin, args.join(' '))
     return spawn(bin, args, opts);
   }
 
@@ -64,6 +68,7 @@ function SimpleUpstartApi () {
     }).resume())
 
     c.on('error', function (err) {
+      err && debug('err %s', err)
       then && then(err);
       then = null;
     })
@@ -111,7 +116,10 @@ function SimpleUpstartApi () {
     child.stdout.on('data', function (d){stdout+=d.toString()})
     child.stderr.on('data', function (d){stderr+=d.toString()})
     child.on('close', function (code) {
-      then(code>0 ? (stderr||stdout) : null)
+      code>0 && debug('code %s', code);
+      stdout && debug('stdout %s', stdout);
+      stderr && debug('stderr %s', stderr);
+      then(code>0 ? (stderr||stdout) : null);
     })
     child.on('error', then)
   }
@@ -172,23 +180,35 @@ function SimpleUpstartApi () {
     return content;
   }
 
+  this.setupLogFile = function (logFile, username, groupname, then) {
+    getFs().touch(logFile, function (err) {
+      if (err) return then(err);
+      getFs().chown(logFile, username, groupname, function (err) {
+        if (err) return then(err);
+        getFs().chmod(logFile, 0640, then)
+      })
+    })
+  }
+
   this.install = function (opts, then) {
     var content = generateScriptContent(opts.stanzas || [], opts.comments || opts.id + " - no description provided")
 
     var dir = confDir;
     if (opts.user) dir = path.join(process.env['HOME'], '.init');
 
+    debug('dir %s', dir);
     (getFs().mkdirs || getFs().mkdir)(dir, function (err) {
       if (err) return then(err)
-      var fPath = path.join(dir, opts.id + '.conf')
+      var fPath = path.join(dir, opts.id + '.conf');
+      debug('fPath %s', fPath);
       getFs().writeFile(fPath, content, then)
     })
   }
 
   this.uninstall = function (opts, then) {
-    var fPath = path.join(confDir, opts.id + '.conf')
+    var fPath = path.join(confDir, opts.id + '.conf');
     if (opts.user) fPath = path.join(process.env['HOME'], '.init', opts.id + '.conf');
-
+    debug('fPath %s', fPath);
     getFs().unlink(fPath, then)
   }
 

@@ -24,7 +24,8 @@
   "dependencies": {
     "@mh-cbon/c-yasudo": "^1.0.1",
     "@mh-cbon/sp-lsbish": "^1.0.1",
-    "@mh-cbon/sudo-fs": "^1.0.2",
+    "@mh-cbon/sudo-fs": "^1.0.9",
+    "debug": "^2.2.0",
     "fs-extra": "^0.26.7",
     "split": "^1.0.0",
     "through2": "^2.0.1"
