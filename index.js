@@ -127,26 +127,26 @@ function SimpleUpstartApi () {
   this.start = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['start', serviceId], {stdio: 'pipe'})
-    else c = spawnAChild('service', [serviceId, 'start'], {stdio: 'pipe'})
+    else c = spawnAChild('initctl', ['start', serviceId], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.stop = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['stop', serviceId], {stdio: 'pipe'})
-    else c = spawnAChild('service', [serviceId, 'stop'], {stdio: 'pipe'})
+    else c = spawnAChild('initctl', ['stop', serviceId], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.restart = function (serviceId, opts, then) {
     var c;
     if (opts.user) c = spawn('initctl', ['restart', serviceId], {stdio: 'pipe'})
-    else c = spawnAChild('service', [serviceId, 'restart'], {stdio: 'pipe'})
+    else c = spawnAChild('initctl', ['restart', serviceId], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.reload = function (serviceId, opts, then) {
     var verb = opts.force ? 'force-reload' : 'reload';
     var c;
     if (opts.user) c = spawn('initctl', [verb, serviceId], {stdio: 'pipe'})
-    else c = spawnAChild('service', [serviceId, verb], {stdio: 'pipe'})
+    else c = spawnAChild('initctl', [verb, serviceId], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.reloadConfiguration = function (opts, then) {
