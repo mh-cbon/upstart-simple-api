@@ -119,9 +119,9 @@ function SimpleUpstartApi () {
       code!==0 && debug('code %s', code);
       stdout && debug('stdout %s', stdout);
       stderr && debug('stderr %s', stderr);
-      then(code!==0 ? (stderr||stdout) : null);
+      then && then(code!==0 ? (stderr||stdout) : null);
     })
-    child.on('error', then);
+    then && child.on('error', then);
     return child;
   }
   this.start = function (serviceId, opts, then) {
