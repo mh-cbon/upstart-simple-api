@@ -62,10 +62,10 @@ function SimpleUpstartApi () {
         chunk.user = !!err;
         cb(null, chunk);
       })
-    }, function (cb) {
+    })).on('end', function () {
       then && then(null, results);
       then = null;
-    }).resume())
+    })
 
     c.on('error', function (err) {
       err && debug('err %s', err)
@@ -76,7 +76,8 @@ function SimpleUpstartApi () {
 
 
   this.describe = function (service, opts, then) {
-    if (service.match(/@/)) service = service.match(/^([^@]+)/)[1]
+    if (service.match(/@/)) service = service.match(/^([^@]+)/)[1]; // not related to scoped pkg,
+    // rather than to multiple isntance of same servce
 
     var fPath = path.join(confDir, service + '.conf')
     if (opts.user) fPath = path.join(process.env['HOME'], '.init', service + '.conf')
@@ -213,7 +214,62 @@ function SimpleUpstartApi () {
     getFs().unlink(fPath, then)
   }
 
+  this.isDisabled = function (serviceId, opts, then) {
+    if (service.match(/@/)) service = service.match(/^([^@]+)/)[1]
 
+    var fPath = path.join(confDir, service + '.conf')
+    if (opts.user) fPath = path.join(process.env['HOME'], '.init', service + '.conf')
+
+    var isDisabled = false;
+    getFs().createReadStream(fPath)
+    .pipe(split())
+    .on('data', function (d) {
+      if (d.toString().match(/^manual$/)) {
+        isDisabled = true;
+      }
+    })
+    .on('end', function () {
+      then(null, isDisabled);
+    })
+  }
+
+  this.disable = function (serviceId, opts, then) {
+    this.isDisabled(serviceId, opts, function (err, isDisabled) {
+      if (isDisabled) return then(null);
+
+      var data = '';
+      getFs().readFile(fPath, function (err, content) {
+        if (err) return then(err);
+        content += '\nmanual\n';
+        getFs().createWriteStream(fPath)
+        .on('error', then)
+        .on('close', then)
+        .end(content + '\nmanual\n');
+      })
+    })
+  }
+
+  this.enable = function (serviceId, opts, then) {
+    this.isDisabled(serviceId, opts, function (err, isDisabled) {
+      if (!isDisabled) return then(null);
+
+      var data = '';
+      getFs().createReadStream(fPath)
+      .pipe(split())
+      .pipe(through(function (chunk, enc, cb) {
+        if (chunk.toString().match(/^manual$/)) {
+          return cb()
+        }
+        cb(null, chunk + '\n')
+      }))
+      .on('data', function (d) {
+        data += d.toString();
+      })
+      .on('end', function () {
+        getFs().createWriteStream(fPath).end(data);
+      })
+    })
+  }
 }
 
 module.exports = SimpleUpstartApi;
