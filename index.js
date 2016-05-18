@@ -246,15 +246,18 @@ function SimpleUpstartApi () {
       var fPath = path.join(confDir, serviceId + '.conf')
       if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
-      var data = '';
-      getFs().readFile(fPath, function (err, content) {
-        if (err) return then(err);
-        content += '\nmanual\n';
-        getFs().createWriteStream(fPath)
-        .on('error', then)
-        .on('close', then)
-        .end(content + '\nmanual\n');
-      })
+      getFs().exists(fPath, function (ex) {
+        if(!ex) return then(new Error('file does not exists'));
+        var data = '';
+        getFs().readFile(fPath, function (err, content) {
+          if (err) return then(err);
+          content += '\nmanual\n';
+          getFs().createWriteStream(fPath)
+          .on('error', then)
+          .on('close', then)
+          .end(content + '\nmanual\n');
+        })
+      });
     })
   }
 
@@ -268,19 +271,25 @@ function SimpleUpstartApi () {
       var fPath = path.join(confDir, serviceId + '.conf')
       if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
-      var data = '';
-      getFs().createReadStream(fPath)
-      .pipe(split())
-      .pipe(through2(function (chunk, enc, cb) {
-        if (chunk.toString().match(/^manual$/)) {
-          return cb()
-        }
-        data += chunk.toString() + '\n';
-        cb(null, chunk + '\n')
-      }))
-      .on('end', function () {
-        getFs().createWriteStream(fPath).end(data);
-      })
+      getFs().exists(fPath, function (ex) {
+        if(!ex) return then(new Error('file does not exists'));
+        var data = '';
+        getFs().createReadStream(fPath)
+        .pipe(split())
+        .pipe(through2(function (chunk, enc, cb) {
+          if (chunk.toString().match(/^manual$/)) {
+            return cb()
+          }
+          data += chunk.toString() + '\n';
+          cb(null, chunk + '\n')
+        }))
+        .on('end', function () {
+          getFs().createWriteStream(fPath)
+          .on('error', then)
+          .on('close', then)
+          .end(data);
+        })
+      });
     })
   }
 }
