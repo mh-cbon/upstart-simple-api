@@ -220,25 +220,30 @@ function SimpleUpstartApi () {
     var fPath = path.join(confDir, serviceId + '.conf')
     if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
-    var isDisabled = false;
-    getFs().createReadStream(fPath)
-    .on('error', function (err) {
-      then(err);
-      then = null;
-    })
-    .pipe(split())
-    .on('data', function (d) {
-      if (d.toString().match(/^manual$/)) {
-        isDisabled = true;
-      }
-    })
-    .on('end', function () {
-      then && then(null, isDisabled);
-    })
+    getFs().exists(fPath, function (ex) {
+      if(!ex) return then(new Error('file does not exists'));
+      var isDisabled = false;
+      getFs().createReadStream(fPath)
+      .on('error', function (err) {
+        then && then(err);
+        then = null;
+      })
+      .pipe(split())
+      .on('data', function (d) {
+        if (d.toString().match(/^manual$/)) {
+          isDisabled = true;
+        }
+      })
+      .on('end', function () {
+        then && then(null, isDisabled);
+        then = null;
+      })
+    });
   }
 
   this.disable = function (serviceId, opts, then) {
     this.isDisabled(serviceId, opts, function (err, isDisabled) {
+      if (err) return then(err);
       if (isDisabled) return then(null);
 
       if (serviceId.match(/@/)) serviceId = serviceId.match(/^([^@]+)/)[1]
@@ -246,18 +251,21 @@ function SimpleUpstartApi () {
       var fPath = path.join(confDir, serviceId + '.conf')
       if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
-      getFs().exists(fPath, function (ex) {
-        if(!ex) return then(new Error('file does not exists'));
-        var data = '';
-        getFs().readFile(fPath, function (err, content) {
-          if (err) return then(err);
-          content += '\nmanual\n';
-          getFs().createWriteStream(fPath)
-          .on('error', then)
-          .on('close', then)
-          .end(content + '\nmanual\n');
+      var data = '';
+      getFs().readFile(fPath, function (err, content) {
+        if (err) return then(err);
+        content += '\nmanual\n';
+        getFs().createWriteStream(fPath)
+        .on('error', function (err) {
+          then && then(err);
+          then = null;
         })
-      });
+        .on('close', function () {
+          then && then();
+          then = null;
+        })
+        .end(content + '\nmanual\n');
+      })
     })
   }
 
@@ -271,25 +279,28 @@ function SimpleUpstartApi () {
       var fPath = path.join(confDir, serviceId + '.conf')
       if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
-      getFs().exists(fPath, function (ex) {
-        if(!ex) return then(new Error('file does not exists'));
-        var data = '';
-        getFs().createReadStream(fPath)
-        .pipe(split())
-        .pipe(through2(function (chunk, enc, cb) {
-          if (chunk.toString().match(/^manual$/)) {
-            return cb()
-          }
-          data += chunk.toString() + '\n';
-          cb(null, chunk + '\n')
-        }))
-        .on('end', function () {
-          getFs().createWriteStream(fPath)
-          .on('error', then)
-          .on('close', then)
-          .end(data);
+      var data = '';
+      getFs().createReadStream(fPath)
+      .pipe(split())
+      .pipe(through2(function (chunk, enc, cb) {
+        if (chunk.toString().match(/^manual$/)) {
+          return cb()
+        }
+        data += chunk.toString() + '\n';
+        cb(null, chunk + '\n')
+      }))
+      .on('end', function () {
+        getFs().createWriteStream(fPath)
+        .on('error', function (err) {
+          then && then(err);
+          then = null;
         })
-      });
+        .on('close', function () {
+          then && then();
+          then = null;
+        })
+        .end(data);
+      })
     })
   }
 }
