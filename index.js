@@ -215,10 +215,10 @@ function SimpleUpstartApi () {
   }
 
   this.isDisabled = function (serviceId, opts, then) {
-    if (service.match(/@/)) service = service.match(/^([^@]+)/)[1]
+    if (serviceId.match(/@/)) serviceId = serviceId.match(/^([^@]+)/)[1]
 
-    var fPath = path.join(confDir, service + '.conf')
-    if (opts.user) fPath = path.join(process.env['HOME'], '.init', service + '.conf')
+    var fPath = path.join(confDir, serviceId + '.conf')
+    if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
     var isDisabled = false;
     getFs().createReadStream(fPath)
