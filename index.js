@@ -222,6 +222,10 @@ function SimpleUpstartApi () {
 
     var isDisabled = false;
     getFs().createReadStream(fPath)
+    .on('error', function (err) {
+      then(err);
+      then = null;
+    })
     .pipe(split())
     .on('data', function (d) {
       if (d.toString().match(/^manual$/)) {
@@ -229,7 +233,7 @@ function SimpleUpstartApi () {
       }
     })
     .on('end', function () {
-      then(null, isDisabled);
+      then && then(null, isDisabled);
     })
   }
 
@@ -256,6 +260,7 @@ function SimpleUpstartApi () {
 
   this.enable = function (serviceId, opts, then) {
     this.isDisabled(serviceId, opts, function (err, isDisabled) {
+      if (err) return then(err);
       if (!isDisabled) return then(null);
 
       if (serviceId.match(/@/)) serviceId = serviceId.match(/^([^@]+)/)[1]
@@ -266,15 +271,13 @@ function SimpleUpstartApi () {
       var data = '';
       getFs().createReadStream(fPath)
       .pipe(split())
-      .pipe(through(function (chunk, enc, cb) {
+      .pipe(through2(function (chunk, enc, cb) {
         if (chunk.toString().match(/^manual$/)) {
           return cb()
         }
+        data += chunk.toString() + '\n';
         cb(null, chunk + '\n')
       }))
-      .on('data', function (d) {
-        data += d.toString();
-      })
       .on('end', function () {
         getFs().createWriteStream(fPath).end(data);
       })
