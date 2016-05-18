@@ -237,6 +237,11 @@ function SimpleUpstartApi () {
     this.isDisabled(serviceId, opts, function (err, isDisabled) {
       if (isDisabled) return then(null);
 
+      if (serviceId.match(/@/)) serviceId = serviceId.match(/^([^@]+)/)[1]
+
+      var fPath = path.join(confDir, serviceId + '.conf')
+      if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
+
       var data = '';
       getFs().readFile(fPath, function (err, content) {
         if (err) return then(err);
@@ -252,6 +257,11 @@ function SimpleUpstartApi () {
   this.enable = function (serviceId, opts, then) {
     this.isDisabled(serviceId, opts, function (err, isDisabled) {
       if (!isDisabled) return then(null);
+
+      if (serviceId.match(/@/)) serviceId = serviceId.match(/^([^@]+)/)[1]
+
+      var fPath = path.join(confDir, serviceId + '.conf')
+      if (opts.user) fPath = path.join(process.env['HOME'], '.init', serviceId + '.conf')
 
       var data = '';
       getFs().createReadStream(fPath)
