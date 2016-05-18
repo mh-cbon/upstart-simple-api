@@ -62,10 +62,11 @@ function SimpleUpstartApi () {
         chunk.user = !!err;
         cb(null, chunk);
       })
-    })).on('end', function () {
+    }, function (cb) {
       then && then(null, results);
       then = null;
-    })
+      cb();
+    }).resume())
 
     c.on('error', function (err) {
       err && debug('err %s', err)
@@ -144,10 +145,9 @@ function SimpleUpstartApi () {
     return runSystemControls(c, then)
   }
   this.reload = function (serviceId, opts, then) {
-    var verb = opts.force ? 'force-reload' : 'reload';
     var c;
-    if (opts.user) c = spawn('initctl', [verb, serviceId], {stdio: 'pipe'})
-    else c = spawnAChild('initctl', [verb, serviceId], {stdio: 'pipe'})
+    if (opts.user) c = spawn('initctl', ['reload', serviceId], {stdio: 'pipe'})
+    else c = spawnAChild('initctl', ['reload', serviceId], {stdio: 'pipe'})
     return runSystemControls(c, then)
   }
   this.reloadConfiguration = function (opts, then) {
